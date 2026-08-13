@@ -22,11 +22,11 @@ struct MyApp: App {
                     .tag(AppTab.review)
 
                 LibraryView()
-                    .tabItem { Label("Сан", systemImage: "book.fill") }
+                    .tabItem { Label("Сан", systemImage: "books.vertical.fill") }
                     .tag(AppTab.library)
 
                 ProfileView()
-                    .tabItem { Label("Профайл", systemImage: "person.fill") }
+                    .tabItem { Label("Профайл", systemImage: "person.crop.circle") }
                     .tag(AppTab.profile)
             }
             .preferredColorScheme(isDarkMode ? .dark : .light)

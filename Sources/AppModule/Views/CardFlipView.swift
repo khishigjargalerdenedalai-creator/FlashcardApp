@@ -13,10 +13,19 @@ struct CardFlipView: View {
 
             face(text: back, explanation: explanation)
                 .opacity(isFlipped ? 1 : 0)
-                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+                .rotation3DEffect(
+                    .degrees(180),
+                    axis: (x: 0, y: 1, z: 0),
+                    perspective: 0.4
+                )
         }
-        .rotation3DEffect(.degrees(isFlipped ? 180 : 0), axis: (x: 0, y: 1, z: 0))
-        .animation(.spring(response: 0.45, dampingFraction: 0.8), value: isFlipped)
+        .rotation3DEffect(
+            .degrees(isFlipped ? 180 : 0),
+            axis: (x: 0, y: 1, z: 0),
+            perspective: 0.4
+        )
+        .shadow(color: .black.opacity(0.18), radius: 16, x: 0, y: 10)
+        .animation(.spring(response: 0.5, dampingFraction: 0.72), value: isFlipped)
         .contentShape(Rectangle())
         .onTapGesture {
             isFlipped.toggle()
@@ -24,10 +33,9 @@ struct CardFlipView: View {
     }
 
     private func face(text: String, explanation: String = "") -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Metrics.spacingS) {
             Text(text)
-                .font(.title2)
-                .fontWeight(.semibold)
+                .font(.system(.title2, design: .rounded).weight(.semibold))
                 .multilineTextAlignment(.center)
 
             if !explanation.isEmpty {
@@ -37,12 +45,15 @@ struct CardFlipView: View {
                     .multilineTextAlignment(.center)
             }
         }
-        .padding(24)
+        .padding(Metrics.spacingL)
         .frame(maxWidth: .infinity, minHeight: 220)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+        .background(
+            RoundedRectangle(cornerRadius: Metrics.cornerRadius, style: .continuous)
+                .fill(Color(.secondarySystemBackground))
+        )
         .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .strokeBorder(.quaternary)
+            RoundedRectangle(cornerRadius: Metrics.cornerRadius, style: .continuous)
+                .strokeBorder(Color(.separator).opacity(0.25))
         )
     }
 }

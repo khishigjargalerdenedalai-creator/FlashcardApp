@@ -19,7 +19,7 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: Metrics.spacingL) {
                     greeting
                     retentionCard
 
@@ -27,55 +27,59 @@ struct HomeView: View {
                         selectedTab = .review
                     } label: {
                         Label("Давтаж эхлэх", systemImage: "play.fill")
-                            .font(.headline)
+                            .font(.system(.headline, design: .rounded).weight(.semibold))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, Metrics.spacingS)
                     }
                     .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.roundedRectangle(radius: Metrics.cornerRadius))
+                    .controlSize(.large)
                     .disabled(dueCount == 0)
 
                     spacesSection
                 }
-                .padding()
+                .padding(Metrics.spacingM)
             }
             .navigationTitle("Нүүр")
         }
     }
 
     private var greeting: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: Metrics.spacingS) {
             Text("Сайн байна уу")
-                .font(.title2.bold())
+                .font(.system(.largeTitle, design: .rounded).weight(.bold))
             Text(dueCount > 0 ? "Өнөөдөр \(dueCount) карт хүлээж байна" : "Өнөөдөр давтах карт алга")
                 .foregroundStyle(.secondary)
         }
     }
 
     private var retentionCard: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: Metrics.spacingS) {
             Text("\(Int(retention.rounded()))%")
-                .font(.system(size: 48, weight: .bold, design: .rounded))
+                .font(.system(size: 52, weight: .bold, design: .rounded))
             Text("Тогтвортой эзэмшилтийн хувь")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+        .padding(.vertical, Metrics.spacingL)
+        .surfaceCard()
     }
 
     private var spacesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Metrics.spacingM) {
             Text("Learning Space-үүд")
-                .font(.headline)
+                .font(.system(.title3, design: .rounded).weight(.semibold))
 
             if spaces.isEmpty {
                 Text("Одоогоор Space алга. Сан таб дээрээс үүсгэнэ үү.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             } else {
-                ForEach(spaces) { space in
-                    spaceRow(space)
+                VStack(spacing: Metrics.spacingS) {
+                    ForEach(spaces) { space in
+                        spaceRow(space)
+                    }
                 }
             }
         }
@@ -83,17 +87,18 @@ struct HomeView: View {
 
     private func spaceRow(_ space: LearningSpace) -> some View {
         let mastered = SpacedRepetitionEngine.masteredPercentage(of: space.cards)
-        return VStack(alignment: .leading, spacing: 6) {
+        return VStack(alignment: .leading, spacing: Metrics.spacingS) {
             HStack {
                 Text(space.name)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
                 Spacer()
                 Text("\(Int(mastered.rounded()))%")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            ProgressView(value: mastered, total: 100)
+            GradientProgressBar(progress: mastered)
         }
-        .padding(.vertical, 4)
+        .padding(Metrics.spacingM)
+        .surfaceCard()
     }
 }

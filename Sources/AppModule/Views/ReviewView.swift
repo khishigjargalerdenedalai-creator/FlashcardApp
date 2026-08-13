@@ -20,17 +20,17 @@ struct ReviewView: View {
                         explanation: card.explanation,
                         isFlipped: $isFlipped
                     )
-                    .padding(.horizontal)
+                    .padding(.horizontal, Metrics.spacingM)
                     Spacer()
 
                     if isFlipped {
                         ratingButtons(for: card)
-                            .padding(.bottom, 24)
+                            .padding(.bottom, Metrics.spacingL)
                     } else {
                         Text("Хариултыг харахын тулд картан дээр товшино уу")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
-                            .padding(.bottom, 24)
+                            .padding(.bottom, Metrics.spacingL)
                     }
                 } else {
                     emptyState
@@ -42,24 +42,24 @@ struct ReviewView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Metrics.spacingM) {
             Image(systemName: "checkmark.circle")
                 .font(.system(size: 48))
-                .foregroundStyle(.green)
+                .foregroundStyle(.accentColor)
             Text("Өнөөдрийн давталт дууслаа")
-                .font(.headline)
+                .font(.system(.headline, design: .rounded).weight(.semibold))
         }
         .frame(maxHeight: .infinity)
     }
 
     private func ratingButtons(for card: Card) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: Metrics.spacingS) {
             ratingButton("Дахин", color: .red) { rate(card, .again) }
             ratingButton("Хэцүү", color: .orange) { rate(card, .hard) }
-            ratingButton("Зөв", color: .blue) { rate(card, .good) }
+            ratingButton("Зөв", color: .accentColor) { rate(card, .good) }
             ratingButton("Амархан", color: .green) { rate(card, .easy) }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, Metrics.spacingM)
     }
 
     private func ratingButton(_ title: String, color: Color, action: @escaping () -> Void) -> some View {
@@ -67,9 +67,10 @@ struct ReviewView: View {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, Metrics.spacingS)
         }
         .buttonStyle(.borderedProminent)
+        .buttonBorderShape(.roundedRectangle(radius: Metrics.cornerRadius / 1.5))
         .tint(color)
     }
 

@@ -17,6 +17,10 @@ struct ProfileView: View {
         cards.filter { SpacedRepetitionEngine.masteryLevel(for: $0) == .learning }.count
     }
 
+    private var overallMastery: Double {
+        SpacedRepetitionEngine.masteredPercentage(of: cards)
+    }
+
     private struct DailyCount: Identifiable {
         let id = UUID()
         let day: Date
@@ -54,10 +58,20 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Ерөнхий тойм") {
-                    statRow("Нийт карт", "\(cards.count)")
-                    statRow("Эзэмшсэн", "\(masteredCount)")
-                    statRow("Суралцаж буй", "\(learningCount)")
+                Section {
+                    HStack(spacing: Metrics.spacingL) {
+                        CircularProgressGauge(progress: overallMastery)
+                            .frame(width: 84, height: 84)
+
+                        VStack(alignment: .leading, spacing: Metrics.spacingS) {
+                            statRow("Нийт карт", "\(cards.count)")
+                            statRow("Эзэмшсэн", "\(masteredCount)")
+                            statRow("Суралцаж буй", "\(learningCount)")
+                        }
+                    }
+                    .padding(.vertical, Metrics.spacingS)
+                } header: {
+                    Text("Ерөнхий тойм")
                 }
 
                 Section("Долоо хоногийн давталт") {
@@ -66,7 +80,8 @@ struct ProfileView: View {
                             x: .value("Өдөр", item.day, unit: .day),
                             y: .value("Тоо", item.count)
                         )
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.accentColor)
+                        .cornerRadius(4)
                     }
                     .frame(height: 160)
                     .chartXAxis {
@@ -74,7 +89,7 @@ struct ProfileView: View {
                             AxisValueLabel(format: .dateTime.weekday(.narrow))
                         }
                     }
-                    .padding(.vertical, 4)
+                    .padding(.vertical, Metrics.spacingS)
                 }
 
                 if !difficultSpaces.isEmpty {
@@ -96,6 +111,7 @@ struct ProfileView: View {
                     }
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("Профайл")
         }
     }
@@ -103,9 +119,10 @@ struct ProfileView: View {
     private func statRow(_ title: String, _ value: String) -> some View {
         HStack {
             Text(title)
+                .foregroundStyle(.secondary)
             Spacer()
             Text(value)
-                .foregroundStyle(.secondary)
+                .font(.system(.body, design: .rounded).weight(.semibold))
         }
     }
 }

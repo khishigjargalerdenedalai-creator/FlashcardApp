@@ -13,18 +13,23 @@ struct LibraryView: View {
             List {
                 ForEach(spaces) { space in
                     NavigationLink(value: space) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(space.name)
-                                .font(.headline)
-                            Text("\(space.cards.count) карт")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding(.vertical, 4)
+                        spaceCard(space)
                     }
+                    .buttonStyle(.plain)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(
+                        EdgeInsets(
+                            top: Metrics.spacingS,
+                            leading: Metrics.spacingM,
+                            bottom: Metrics.spacingS,
+                            trailing: Metrics.spacingM
+                        )
+                    )
                 }
                 .onDelete(perform: deleteSpaces)
             }
+            .listStyle(.plain)
             .navigationTitle("Сан")
             .navigationDestination(for: LearningSpace.self) { space in
                 SpaceDetailView(space: space)
@@ -53,6 +58,26 @@ struct LibraryView: View {
                 }
             }
         }
+    }
+
+    private func spaceCard(_ space: LearningSpace) -> some View {
+        let mastered = SpacedRepetitionEngine.masteredPercentage(of: space.cards)
+        return VStack(alignment: .leading, spacing: Metrics.spacingS) {
+            HStack {
+                Text(space.name)
+                    .font(.system(.headline, design: .rounded).weight(.semibold))
+                Spacer()
+                Text("\(space.cards.count) карт")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            GradientProgressBar(progress: mastered)
+            Text("\(Int(mastered.rounded()))% эзэмшсэн")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(Metrics.spacingM)
+        .surfaceCard()
     }
 
     private func addSpace() {
@@ -91,17 +116,23 @@ private struct SpaceDetailView: View {
                 Button {
                     editingCard = card
                 } label: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(card.front)
-                            .foregroundStyle(.primary)
-                        Text(card.back)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    cardRow(card)
                 }
+                .buttonStyle(.plain)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .listRowInsets(
+                    EdgeInsets(
+                        top: Metrics.spacingS,
+                        leading: Metrics.spacingM,
+                        bottom: Metrics.spacingS,
+                        trailing: Metrics.spacingM
+                    )
+                )
             }
             .onDelete(perform: deleteCards)
         }
+        .listStyle(.plain)
         .searchable(text: $searchText, prompt: "Карт хайх")
         .navigationTitle(space.name)
         .toolbar {
@@ -130,6 +161,20 @@ private struct SpaceDetailView: View {
                 ContentUnavailableView.search(text: searchText)
             }
         }
+    }
+
+    private func cardRow(_ card: Card) -> some View {
+        VStack(alignment: .leading, spacing: Metrics.spacingS) {
+            Text(card.front)
+                .font(.system(.body, design: .rounded).weight(.semibold))
+                .foregroundStyle(.primary)
+            Text(card.back)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(Metrics.spacingM)
+        .surfaceCard()
     }
 
     private func deleteCards(at offsets: IndexSet) {

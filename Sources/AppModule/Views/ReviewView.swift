@@ -45,7 +45,7 @@ struct ReviewView: View {
         VStack(spacing: Metrics.spacingM) {
             Image(systemName: "checkmark.circle")
                 .font(.system(size: 48))
-                .foregroundStyle(.accentColor)
+                .foregroundStyle(Color.accentColor)
             Text("Өнөөдрийн давталт дууслаа")
                 .font(.system(.headline, design: .rounded).weight(.semibold))
         }
@@ -56,7 +56,7 @@ struct ReviewView: View {
         HStack(spacing: Metrics.spacingS) {
             ratingButton("Дахин", color: .red) { rate(card, .again) }
             ratingButton("Хэцүү", color: .orange) { rate(card, .hard) }
-            ratingButton("Зөв", color: .accentColor) { rate(card, .good) }
+            ratingButton("Зөв", color: Color.accentColor) { rate(card, .good) }
             ratingButton("Амархан", color: .green) { rate(card, .easy) }
         }
         .padding(.horizontal, Metrics.spacingM)

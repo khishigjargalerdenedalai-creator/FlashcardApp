@@ -80,7 +80,7 @@ struct ProfileView: View {
                             x: .value("Өдөр", item.day, unit: .day),
                             y: .value("Тоо", item.count)
                         )
-                        .foregroundStyle(.accentColor)
+                        .foregroundStyle(Color.accentColor)
                         .cornerRadius(4)
                     }
                     .frame(height: 160)

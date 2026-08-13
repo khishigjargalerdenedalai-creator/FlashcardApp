@@ -12,49 +12,88 @@ struct HomeView: View {
         return cards.filter { ($0.nextReviewAt ?? .distantPast) <= now }.count
     }
 
+    private var retention: Double {
+        SpacedRepetitionEngine.accuracyPercentage(of: cards)
+    }
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                VStack(spacing: 8) {
-                    Text("\(dueCount)")
-                        .font(.system(size: 56, weight: .bold, design: .rounded))
-                    Text("карт давтах хугацаатай")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.top, 32)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 28) {
+                    greeting
+                    retentionCard
 
-                if dueCount > 0 {
                     Button {
                         selectedTab = .review
                     } label: {
-                        Label("Давталт эхлүүлэх", systemImage: "play.fill")
+                        Label("Давтаж эхлэх", systemImage: "play.fill")
+                            .font(.headline)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
+                            .padding(.vertical, 12)
                     }
                     .buttonStyle(.borderedProminent)
-                    .padding(.horizontal, 32)
-                }
+                    .disabled(dueCount == 0)
 
-                VStack(spacing: 12) {
-                    statRow(title: "Learning Space", value: "\(spaces.count)")
-                    statRow(title: "Нийт карт", value: "\(cards.count)")
+                    spacesSection
                 }
-                .padding(.horizontal, 32)
-
-                Spacer()
+                .padding()
             }
             .navigationTitle("Нүүр")
         }
     }
 
-    private func statRow(title: String, value: String) -> some View {
-        HStack {
-            Text(title)
+    private var greeting: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Сайн байна уу")
+                .font(.title2.bold())
+            Text(dueCount > 0 ? "Өнөөдөр \(dueCount) карт хүлээж байна" : "Өнөөдөр давтах карт алга")
                 .foregroundStyle(.secondary)
-            Spacer()
-            Text(value)
-                .fontWeight(.semibold)
         }
+    }
+
+    private var retentionCard: some View {
+        VStack(spacing: 4) {
+            Text("\(Int(retention.rounded()))%")
+                .font(.system(size: 48, weight: .bold, design: .rounded))
+            Text("Тогтвортой эзэмшилтийн хувь")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+    }
+
+    private var spacesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Learning Space-үүд")
+                .font(.headline)
+
+            if spaces.isEmpty {
+                Text("Одоогоор Space алга. Сан таб дээрээс үүсгэнэ үү.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(spaces) { space in
+                    spaceRow(space)
+                }
+            }
+        }
+    }
+
+    private func spaceRow(_ space: LearningSpace) -> some View {
+        let mastered = SpacedRepetitionEngine.masteredPercentage(of: space.cards)
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(space.name)
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Text("\(Int(mastered.rounded()))%")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            ProgressView(value: mastered, total: 100)
+        }
+        .padding(.vertical, 4)
     }
 }

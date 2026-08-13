@@ -75,10 +75,19 @@ private struct SpaceDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var isAddingCard = false
     @State private var editingCard: Card?
+    @State private var searchText = ""
+
+    private var filteredCards: [Card] {
+        guard !searchText.isEmpty else { return space.cards }
+        let query = searchText.lowercased()
+        return space.cards.filter {
+            $0.front.lowercased().contains(query) || $0.back.lowercased().contains(query)
+        }
+    }
 
     var body: some View {
         List {
-            ForEach(space.cards) { card in
+            ForEach(filteredCards) { card in
                 Button {
                     editingCard = card
                 } label: {
@@ -93,6 +102,7 @@ private struct SpaceDetailView: View {
             }
             .onDelete(perform: deleteCards)
         }
+        .searchable(text: $searchText, prompt: "Карт хайх")
         .navigationTitle(space.name)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -116,13 +126,15 @@ private struct SpaceDetailView: View {
                     systemImage: "rectangle.on.rectangle",
                     description: Text("+ товчоор шинэ карт нэмнэ үү")
                 )
+            } else if filteredCards.isEmpty {
+                ContentUnavailableView.search(text: searchText)
             }
         }
     }
 
     private func deleteCards(at offsets: IndexSet) {
         for index in offsets {
-            modelContext.delete(space.cards[index])
+            modelContext.delete(filteredCards[index])
         }
     }
 }

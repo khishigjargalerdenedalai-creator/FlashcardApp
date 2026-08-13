@@ -60,3 +60,33 @@ enum SpacedRepetitionEngine {
         return Calendar.current.date(byAdding: .day, value: intervalDays, to: now) ?? now
     }
 }
+
+enum MasteryLevel {
+    case new
+    case learning
+    case mastered
+}
+
+extension SpacedRepetitionEngine {
+    /// Stability (өдрөөр) энэ түвшнээс дээш хүрвэл карт "эзэмшсэн" гэж үзнэ.
+    static let masteryStabilityThreshold: Double = 21
+
+    static func masteryLevel(for card: Card) -> MasteryLevel {
+        if card.reviewCount == 0 { return .new }
+        return card.stability >= masteryStabilityThreshold ? .mastered : .learning
+    }
+
+    static func masteredPercentage(of cards: [Card]) -> Double {
+        guard !cards.isEmpty else { return 0 }
+        let masteredCount = cards.filter { masteryLevel(for: $0) == .mastered }.count
+        return Double(masteredCount) / Double(cards.count) * 100
+    }
+
+    static func accuracyPercentage(of cards: [Card]) -> Double {
+        let reviewed = cards.filter { $0.reviewCount > 0 }
+        let totalReviews = reviewed.reduce(0) { $0 + $1.reviewCount }
+        guard totalReviews > 0 else { return 0 }
+        let totalCorrect = reviewed.reduce(0) { $0 + $1.correctCount }
+        return Double(totalCorrect) / Double(totalReviews) * 100
+    }
+}

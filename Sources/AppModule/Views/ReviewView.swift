@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct ReviewView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query private var allCards: [Card]
 
     @State private var queue: [Card] = []
@@ -35,7 +36,7 @@ struct ReviewView: View {
                     emptyState
                 }
             }
-            .navigationTitle("Давталт")
+            .navigationTitle("Давтах")
             .onAppear(perform: loadQueueIfNeeded)
         }
     }
@@ -45,7 +46,7 @@ struct ReviewView: View {
             Image(systemName: "checkmark.circle")
                 .font(.system(size: 48))
                 .foregroundStyle(.green)
-            Text("Өнөөдөр давтах карт алга")
+            Text("Өнөөдрийн давталт дууслаа")
                 .font(.headline)
         }
         .frame(maxHeight: .infinity)
@@ -55,7 +56,7 @@ struct ReviewView: View {
         HStack(spacing: 10) {
             ratingButton("Дахин", color: .red) { rate(card, .again) }
             ratingButton("Хэцүү", color: .orange) { rate(card, .hard) }
-            ratingButton("Сайн", color: .blue) { rate(card, .good) }
+            ratingButton("Зөв", color: .blue) { rate(card, .good) }
             ratingButton("Амархан", color: .green) { rate(card, .easy) }
         }
         .padding(.horizontal)
@@ -74,6 +75,7 @@ struct ReviewView: View {
 
     private func rate(_ card: Card, _ rating: ReviewRating) {
         SpacedRepetitionEngine.review(card, rating: rating)
+        modelContext.insert(ReviewLog(date: Date()))
         isFlipped = false
         queue.removeFirst()
     }
